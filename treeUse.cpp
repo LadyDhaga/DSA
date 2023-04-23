@@ -1,6 +1,7 @@
 #include <iostream>
 #include <queue>
 #include "TreeNode.h"
+#include <bits/stdc++.h>
 using namespace std;
 
 TreeNode<int> *takeInputLevelWise()
@@ -295,9 +296,136 @@ TreeNode<int> *secondLargestElement(TreeNode<int> *root)
     auto y = pq.top();
     return y.second;
 }
+
 // second largest without priority queue
-TreeNode<int> *secondLargestElementBestApproach(TreeNode<int> *r)
+// helper for this
+/* my solution -- not applicable */
+// pair<TreeNode<int> *, pair<int, int>> secondLargestElementBestApproachHelper(TreeNode<int> *jadd)
+// {
+//     if (!jadd)
+//         return make_pair(nullptr, make_pair(INT_MIN, INT_MIN));
+//     pair<TreeNode<int> *, pair<int, int>> np;
+//     np = make_pair(jadd, make_pair(jadd->data, INT_MIN));
+//     for (int i = 0; i < jadd->children.size(); i++)
+//     {
+//         pair<TreeNode<int> *, pair<int, int>> p1 = secondLargestElementBestApproachHelper(jadd->children[i]);
+//         if (np.second.first <= p1.second.first)
+//         {
+//             auto kutta = np.second.first;
+//             np.second.first = p1.second.first;
+//             if (kutta <= p1.second.second)
+//             {
+//                 np.second.second = p1.second.second;
+//                 np.first = p1.first;
+//             }
+//             else
+//             {
+//                 np.second.second = kutta;
+//             }
+//         }
+//         else
+//         {
+//             if (np.second.second <= p1.second.second)
+//             {
+//                 np.first = p1.first;
+//                 np.second.second = p1.second.first;
+//             }
+//             else if (np.second.second <= p1.second.second)
+//             {
+//                 np.second.second = p1.second.second;
+//                 np.first = p1.first;
+//             }
+//         }
+//     }
+//     return np;
+// }
+
+// upper helper function from chatGPT
+pair<TreeNode<int> *, pair<int, int>> secondLargestElementBestApproachHelper(TreeNode<int> *jadd)
 {
+    if (!jadd)
+        return make_pair(nullptr, make_pair(INT_MIN, INT_MIN));
+
+    pair<TreeNode<int> *, pair<int, int>> np;
+    np = make_pair(jadd, make_pair(jadd->data, INT_MIN));
+
+    for (int i = 0; i < jadd->children.size(); i++)
+    {
+        pair<TreeNode<int> *, pair<int, int>> p1 = secondLargestElementBestApproachHelper(jadd->children[i]);
+
+        if (p1.second.first > np.second.first)
+        {
+            np.second.second = np.second.first;
+            np.second.first = p1.second.first;
+            np.first = p1.first;
+        }
+        else if (p1.second.first > np.second.second && p1.second.first != np.second.first)
+        {
+            np.second.second = p1.second.first;
+            np.first = p1.first;
+        }
+        else if (p1.second.second > np.second.second && np.second.first == jadd->data)
+        {
+            np.second.second = p1.second.second;
+            np.first = p1.first;
+        }
+    }
+
+    return np;
+}
+
+TreeNode<int> *secondLargestElementBestApproach(TreeNode<int> *jadd)
+{
+    if (!jadd)
+        return NULL;
+    pair<TreeNode<int> *, pair<int, int>> gobar;
+    gobar = secondLargestElementBestApproachHelper(jadd);
+    return gobar.first;
+}
+
+// gitHUB easiest solution
+TreeNode<int> *secondLargest(TreeNode<int> *root)
+{
+    /* Given a generic tree, find and return the node with second largest value
+     * in given tree. Return NULL if no node with required value is present. */
+    if (root == nullptr)
+        return nullptr;
+    int childCount = root->children.size();
+    if (childCount == 0)
+        return nullptr;
+
+    // we have atleast two nodes: root node and one child node
+    TreeNode<int> *largest = root, *secLargest = root->children[0];
+    if (largest->data < secLargest->data)
+    {
+        secLargest = root;
+        largest = root->children[0];
+    }
+    queue<TreeNode<int> *> q;
+    q.push(root);
+    while (!q.empty())
+    {
+        TreeNode<int> *curr = q.front();
+        q.pop();
+        childCount = curr->children.size();
+        for (int i = 0; i < childCount; i++)
+        {
+            q.push(curr->children[i]);
+            if (curr->children[i]->data > secLargest->data)
+            {
+                if (curr->children[i]->data > largest->data)
+                {
+                    secLargest = largest;
+                    largest = curr->children[i];
+                }
+                else
+                {
+                    secLargest = curr->children[i];
+                }
+            }
+        }
+    }
+    return secLargest;
 }
 
 // main
@@ -313,5 +441,5 @@ int main()
     // printTree(root);
     // cout << numNodes(root) << endl;
     auto root = takeInputAndPrintTreeLevelWise();
-    cout << secondLargestElement(root)->data << endl;
+    cout << secondLargestElementBestApproach(root)->data << endl;
 }
