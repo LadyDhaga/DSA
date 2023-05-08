@@ -297,49 +297,6 @@ TreeNode<int> *secondLargestElement(TreeNode<int> *root)
     return y.second;
 }
 
-// second largest without priority queue
-// helper for this
-/* my solution -- not applicable */
-// pair<TreeNode<int> *, pair<int, int>> secondLargestElementBestApproachHelper(TreeNode<int> *jadd)
-// {
-//     if (!jadd)
-//         return make_pair(nullptr, make_pair(INT_MIN, INT_MIN));
-//     pair<TreeNode<int> *, pair<int, int>> np;
-//     np = make_pair(jadd, make_pair(jadd->data, INT_MIN));
-//     for (int i = 0; i < jadd->children.size(); i++)
-//     {
-//         pair<TreeNode<int> *, pair<int, int>> p1 = secondLargestElementBestApproachHelper(jadd->children[i]);
-//         if (np.second.first <= p1.second.first)
-//         {
-//             auto kutta = np.second.first;
-//             np.second.first = p1.second.first;
-//             if (kutta <= p1.second.second)
-//             {
-//                 np.second.second = p1.second.second;
-//                 np.first = p1.first;
-//             }
-//             else
-//             {
-//                 np.second.second = kutta;
-//             }
-//         }
-//         else
-//         {
-//             if (np.second.second <= p1.second.second)
-//             {
-//                 np.first = p1.first;
-//                 np.second.second = p1.second.first;
-//             }
-//             else if (np.second.second <= p1.second.second)
-//             {
-//                 np.second.second = p1.second.second;
-//                 np.first = p1.first;
-//             }
-//         }
-//     }
-//     return np;
-// }
-
 // upper helper function from chatGPT
 pair<TreeNode<int> *, pair<int, int>> secondLargestElementBestApproachHelper(TreeNode<int> *jadd)
 {
@@ -428,6 +385,30 @@ TreeNode<int> *secondLargest(TreeNode<int> *root)
     return secLargest;
 }
 
+// replacing each node with depth
+void replaceWithDepth(TreeNode<int> *jadd)
+{
+    if (!jadd)
+        return;
+    // int childCount = jadd->children.size();
+    queue<TreeNode<int> *> kutta;
+    // int m = height(jadd);
+    jadd->data = 0;
+    // int m = 0;
+    kutta.push(jadd);
+    while (!kutta.empty())
+    {
+        auto naviJadd = kutta.front();
+        kutta.pop();
+        for (int i = 0; i < naviJadd->children.size(); i++)
+        {
+            naviJadd->children[i]->data = 1 + naviJadd->data;
+            kutta.push(naviJadd->children[i]);
+        }
+        // m++;
+    }
+}
+
 // main
 int main()
 {
@@ -441,5 +422,6 @@ int main()
     // printTree(root);
     // cout << numNodes(root) << endl;
     auto root = takeInputAndPrintTreeLevelWise();
-    cout << secondLargestElementBestApproach(root)->data << endl;
+    replaceWithDepth(root);
+    printTreeL(root);
 }
