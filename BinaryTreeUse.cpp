@@ -122,6 +122,52 @@ int binaryheight(BinaryTreeNode<int> *jadd)
     return 1 + max(binaryheight(jadd->khabba), binaryheight(jadd->sajja));
 }
 
+void mirrorTree(BinaryTreeNode<int> *jadd)
+{
+    if (!jadd)
+        return;
+    auto temp = jadd->khabba;
+    jadd->khabba = jadd->sajja;
+    jadd->sajja = temp;
+    mirrorTree(jadd->khabba);
+    mirrorTree(jadd->sajja);
+}
+
+void preOrder(BinaryTreeNode<int> *jadd)
+{
+    if (!jadd)
+        return;
+    cout << jadd->data << " ";
+    preOrder(jadd->khabba);
+    preOrder(jadd->sajja);
+}
+
+void postOrder(BinaryTreeNode<int> *jadd)
+{
+    if (!jadd)
+        return;
+    postOrder(jadd->khabba);
+    postOrder(jadd->sajja);
+    cout << jadd->data << " ";
+}
+
+void inOrder(BinaryTreeNode<int> *jadd)
+{
+    if (!jadd)
+        return;
+    inOrder(jadd->khabba);
+    cout << jadd->data << " ";
+    inOrder(jadd->sajja);
+}
+
+// constructing tree
+BinaryTreeNode<int> *constructFromPreorderInorder()
+{
+    int n;
+    cin >> n;
+    return NULL;
+}
+
 int main()
 {
     // BinaryTreeNode<int> *jadd = new BinaryTreeNode<int>(1);
@@ -134,6 +180,14 @@ int main()
     cout << endl;
     // cout << nodeFrequency(jadd);
     // cout << xPresentOrNot(jadd, 4);
-    cout << binaryheight(jadd);
+    // cout << binaryheight(jadd);
+    // mirrorTree(jadd);
+    cout << "preOrder: ";
+    preOrder(jadd);
+    // postOrder(jadd);
+    cout << endl;
+    cout << "inOrder: ";
+    inOrder(jadd);
+
     delete jadd;
 }
