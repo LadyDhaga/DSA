@@ -229,6 +229,7 @@ BinaryTreeNode<int> *constructFromPreorderInorder()
     BinaryTreeNode<int> *root = majdoorFunction(preOrder, inOrder, 0, inOrder.size() - 1, 0, preOrder.size() - 1);
     return root;
 }
+
 BinaryTreeNode<int> *constructFromPostorderInorder()
 {
     int n;
@@ -274,7 +275,54 @@ bool balanced(BinaryTreeNode<int> *root)
         return 0;
     return abs(binaryheight(root->khabba) - binaryheight(root->sajja)) <= 1 ? true : false;
 }
+bool leafornot(BinaryTreeNode<int> *root)
+{
+    if (!root)
+        return 0;
+    return !root->khabba && !root->sajja;
+}
+BinaryTreeNode<int> *removeLeafNodes(BinaryTreeNode<int> *root)
+{
+    if (!root)
+        return NULL;
+    if (leafornot(root->khabba))
+        root->khabba = NULL;
+    if (leafornot(root->sajja))
+        root->sajja = NULL;
+}
 
+bool search(BinaryTreeNode<int> *root, int k)
+{
+    if (!root)
+        return 0;
+    if (root->data == k)
+        return true;
+    if (root->data < k)
+        return search(root->sajja, k);
+    return search(root->khabba, k);
+}
+
+void inRange(BinaryTreeNode<int> *root, vector<int> &v, int r1, int r2)
+{
+    if (!root)
+        return;
+    if (root->data < r1)
+    {
+        // v.push_back(root->data);
+        inRange(root->sajja, v, r1, r2);
+        return;
+    }
+    if (root->data > r2)
+    {
+        // v.push_back(root->data);
+        inRange(root->khabba, v, r1, r2);
+        return;
+    }
+    inRange(root->khabba, v, r1, r2);
+    v.emplace_back(root->data);
+    inRange(root->sajja, v, r1, r2);
+    return;
+}
 int main()
 {
     // BinaryTreeNode<int> *jadd = new BinaryTreeNode<int>(1);
@@ -307,7 +355,20 @@ int main()
     // cout << endl;
     // cout << p1.second;
     // cout << balanced(jadd) << endl;
-    BinaryTreeNode<int> *jadd = takeInputLevel();
+    // int k;
+    // cin >> k;
+    // cout << search(jadd, k) << endl;
+    // int x, y;
+    // cin >> x;
+    // cin >> y;
+    // vector<int> v;
+    // inRange(jadd, v, x, y);
+    // for (auto i : v)
+    // {
+    //     cout << i << endl;
+    // }
     // 1 2 3 -1 -1 -1 -1
+    // 8 5 10 2 6 -1 -1 -1 -1 -1 7 -1 -1
+    BinaryTreeNode<int> *jadd = takeInputLevel();
     delete jadd;
 }
