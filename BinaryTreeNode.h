@@ -8,8 +8,8 @@ public:
     BinaryTreeNode(T data)
     {
         this->data = data;
-        this->khabba = NULL;
-        this->sajja = NULL;
+        this->khabba = nullptr;
+        this->sajja = nullptr;
     }
     ~BinaryTreeNode()
     {

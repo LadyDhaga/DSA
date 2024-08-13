@@ -119,11 +119,11 @@ bool xPresentOrNot(BinaryTreeNode<int> *jadd, int x)
     return xPresentOrNot(jadd->khabba, x) || xPresentOrNot(jadd->sajja, x);
 }
 
-int binaryheight(BinaryTreeNode<int> *jadd)
+int height(BinaryTreeNode<int> *jadd)
 {
     if (!jadd)
         return 0;
-    return 1 + max(binaryheight(jadd->khabba), binaryheight(jadd->sajja));
+    return 1 + max(height(jadd->khabba), height(jadd->sajja));
 }
 
 void mirrorTree(BinaryTreeNode<int> *jadd)
@@ -275,7 +275,7 @@ bool balanced(BinaryTreeNode<int> *root)
 {
     if (!root)
         return 0;
-    return abs(binaryheight(root->khabba) - binaryheight(root->sajja)) <= 1 ? true : false;
+    return abs(height(root->khabba) - height(root->sajja)) <= 1 ? true : false;
 }
 bool leafornot(BinaryTreeNode<int> *root)
 {
@@ -547,83 +547,207 @@ BinaryTreeNode<int> *LCA(BinaryTreeNode<int> *root, int k, int l)
 {
     if (!root)
         return NULL;
-    if (find(root->khabba, k) && find(root->khabba, l))
+    if (root->data == k)
     {
-        return LCA(root->khabba, k, l);
+        return root;
     }
-    if (find(root->sajja, k) && find(root->sajja, l))
+    if (root->data == l)
     {
-        return LCA(root->sajja, k, l);
+        return root;
     }
+    auto a = LCA(root->khabba, k, l);
+    auto b = LCA(root->sajja, k, l);
+    if (!a)
+        return b;
+    if (!b)
+        return a;
+    return root;
 }
 
-int main()
+int largestBST(BinaryTreeNode<int> *jadd)
 {
-    // BinaryTreeNode<int> *jadd = new BinaryTreeNode<int>(1);
-    // BinaryTreeNode<int> *node1 = new BinaryTreeNode<int>(2);
-    // BinaryTreeNode<int> *node2 = new BinaryTreeNode<int>(3);
-    // jadd->khabba = node1;
-    // jadd->sajja = node2;
-    // BinaryTreeNode<int> *jadd = takeInputLevel();
-    // printTreeLevel(jadd);
-    // cout << endl;
-    // cout << nodeFrequency(jadd);
-    // cout << xPresentOrNot(jadd, 4);
-    // cout << binaryheight(jadd);
-    // mirrorTree(jadd);
-    // cout << "preOrder: ";
-    // preOrder(jadd);
-    // // postOrder(jadd);
-    // cout << endl;
-    // cout << "inOrder: ";
-    // inOrder(jadd);
+    if (!jadd)
+        return 0;
+    if (validBST(jadd))
+        return height(jadd);
+    return max(largestBST(jadd->khabba), largestBST(jadd->sajja));
+}
 
-    // BinaryTreeNode<int> *jadd = constructFromPostorderInorder();
-    // cout << endl;
-    // cout << "Maximum: " << minmax(jadd).first << endl;
-    // cout << "Minimum: " << minmax(jadd).second << endl;
-    // auto p1 = heightDiameter(jadd);
-    // printTreeLevel(jadd);
-    // cout << endl;
-    // cout << p1.first;
-    // cout << endl;
-    // cout << p1.second;
-    // cout << balanced(jadd) << endl;
-    // int k;
-    // cin >> k;
-    // cout << search(jadd, k) << endl;
+class myClass
+{
+public:
+    int min;
+    int max;
+    bool isBst;
+    int height;
+
+    myClass()
+    {
+        this->min = INT_MAX;
+        this->max = INT_MIN;
+        this->isBst = true;
+        this->height = 0;
+    }
+};
+
+myClass largestBstGood(BinaryTreeNode<int> *jadd)
+{
+    if (!jadd)
+    {
+        myClass newClass;
+        newClass.height = 0;
+        newClass.isBst = true;
+        newClass.max = INT_MIN;
+        newClass.min = INT_MAX;
+        return newClass;
+    }
+    myClass leftAns = largestBstGood(jadd->khabba);
+    myClass rightAns = largestBstGood(jadd->sajja);
+    myClass obj;
+    if (leftAns.isBst && rightAns.isBst)
+    {
+        if (jadd->data > leftAns.max && jadd->data < rightAns.min)
+        {
+            obj.height = 1 + max(leftAns.height, rightAns.height);
+        }
+    }
+    obj.height = max(leftAns.height, rightAns.height);
+    obj.isBst = false;
+    obj.max = max(jadd->data, max(leftAns.max, rightAns.max));
+    obj.min = min(jadd->data, min(leftAns.min, rightAns.min));
+    return obj;
+}
+
+void pathSumToLeaf(BinaryTreeNode<int> *jadd, vector<vector<int>> &v, vector<int> &p, int &k, int ans = 0)
+{
+    if (!jadd)
+        return;
+    ans += jadd->data;
+    if (!jadd->khabba && !jadd->sajja)
+    {
+        if (ans == k)
+        {
+            p.push_back(jadd->data);
+            v.push_back(p);
+            return;
+        }
+    }
+    p.push_back(jadd->data);
+    int j = p.size();
+    pathSumToLeaf(jadd->khabba, v, p, k, ans);
+    if (j < p.size())
+    {
+        int m = p.size() - j;
+        while (m--)
+            p.pop_back();
+    }
+    pathSumToLeaf(jadd->sajja, v, p, k, ans);
+    return;
+}
+
+pair<bool, int> finderLc(BinaryTreeNode<int> *root, int k)
+{
+    if (!root)
+    {
+        auto k = make_pair(false, 0);
+        return k;
+    }
+    if (root->data == k)
+    {
+        auto j = make_pair(true, 0);
+        return j;
+    }
+    auto m = finderLc(root->khabba, k);
+    if (m.first)
+    {
+        return make_pair(true, 1 + m.second);
+    }
+    auto n = finderLc(root->sajja, k);
+    if (n.first)
+    {
+        return make_pair(true, 1 + n.second);
+    }
+    return make_pair(false, 0);
+}
+vector<int> distanceK(BinaryTreeNode<int> *root, BinaryTreeNode<int> *target, int k)
+{
+    // to use
+    // auto jadd = takeInputLevel();
     // int x, y;
     // cin >> x;
     // cin >> y;
-    // vector<int> v;
-    // inRange(jadd, v, x, y);
-    // 1 2 3 -1 -1 -1 -1
-    // 8 5 10 2 6 -1 -1 -1 -1 -1 7 -1 -1
-    // cout << validBST(jadd) << endl;
-    // cout << validBST(jadd) << endl;
-    // int n;
-    // cin >> n;
-    // vector<int> v(n);
-    // for (int i = 0; i < n; i++)
-    // {
-    //     cin >> v[i];
-    // }
-    // BinaryTreeNode<int> *jadd = constructBstFromSortedArray(v, 0, n - 1);
-    // noSiblings(jadd, v);
     // cout << endl;
-    // int k;
-    // cin >> k;
-    // vector<int> v = findPath(jadd, k);
+    // vector<int> v = distanceK(jadd, finder(jadd, x), y);
     // for (auto i : v)
     // {
     //     cout << i << " ";
     // }
-    // printTreeLevel(jadd);
-    // insertDuplicates(jadd);
-    BinaryTreeNode<int> *jadd = takeInputLevel();
-    int k;
-    cin >> k;
-    cout << endl;
-    printPairs(jadd, k, jadd);
-    // printTree(jadd);
+    if (!root)
+        return {};
+    unordered_map<BinaryTreeNode<int> *, BinaryTreeNode<int> *> umap;
+    queue<BinaryTreeNode<int> *> bus;
+    bus.push(root);
+    while (!bus.empty())
+    {
+        auto front = bus.front();
+        bus.pop();
+        if (front->khabba)
+        {
+            umap[front->khabba] = front;
+            bus.push(front->khabba);
+        }
+        if (front->sajja)
+        {
+            umap[front->sajja] = front;
+            bus.push(front->sajja);
+        }
+    }
+    vector<int> result;
+    unordered_set<BinaryTreeNode<int> *> visited;
+    visited.insert(target);
+    int dist = 0;
+    bus.push(target);
+    while (!bus.empty())
+    {
+        int levelSize = bus.size();
+        if (dist++ == k)
+        {
+            while (!bus.empty())
+            {
+                auto front = bus.front();
+                bus.pop();
+                result.push_back(front->data);
+            }
+            return result;
+        }
+        while (levelSize--)
+        {
+            auto front = bus.front();
+            bus.pop();
+            if (front->khabba && visited.find(front->khabba) == visited.end())
+            {
+                bus.push(front->khabba);
+                visited.insert(front->khabba);
+            }
+            if (front->sajja && visited.find(front->sajja) == visited.end())
+            {
+                bus.push(front->sajja);
+                visited.insert(front->sajja);
+            }
+            if (umap.find(front) != umap.end() && visited.find(umap[front]) == visited.end())
+            {
+                bus.push(umap[front]);
+                visited.insert(umap[front]);
+            }
+        }
+    }
+    return result;
+}
+
+int main()
+{
+    auto jadd = takeInputLevel();
+    int x;
+    cin >> x;
+    pairSumBinaryTree_withHashmap(jadd, x);
 }
