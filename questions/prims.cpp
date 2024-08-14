@@ -10,6 +10,7 @@ using namespace std;
 int findMinVertex(int *weights, bool *visited, int n)
 {
     int minVertex = -1;
+
     for (int i = 0; i < n; i++)
     {
         if (!visited[i] && (minVertex == -1 || weights[i] < weights[minVertex]))
@@ -17,6 +18,7 @@ int findMinVertex(int *weights, bool *visited, int n)
             minVertex = i;
         }
     }
+
     return minVertex;
 }
 
@@ -31,9 +33,11 @@ void prims(int **edges, int n, int e)
         weight[i] = INT_MAX;
         visited[i] = false;
     }
+
     parent[0] = -1;
     weight[0] = 0;
-    for (int i = 0; i < n - 1; i++) // we are running this loop to only n-1 times coz when we will arrive at the last vertex, its all the neighbours will already be visited.
+
+    for (int i = 0; i < n - 1; i++) // we are running this loop to only n-1 times coz when we will arrive at the last vertex, its all the neighbours would already have been visited.
     {
         // find minimum vertex
         int minVertex = findMinVertex(weight, visited, n); // we can use priority queue here to reduce this parts T.C. from O(n) to O(logn), coz to add or delete an element from a priority queue it takes logarithmic time.
